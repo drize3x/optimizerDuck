@@ -218,10 +218,10 @@ public partial class App : Application
 
             // Apply custom accent colors
             ApplicationAccentColorManager.Apply(
-                Color.FromRgb(254, 209, 20),
-                Color.FromRgb(242, 124, 20),
-                Color.FromRgb(254, 209, 20),
-                Color.FromRgb(242, 124, 20)
+            Color.FromRgb(30, 144, 255),
+            Color.FromRgb(0, 102, 204),
+            Color.FromRgb(30, 144, 255),
+            Color.FromRgb(0, 102, 204) 
             );
 
             ApplicationThemeManager.Apply(
