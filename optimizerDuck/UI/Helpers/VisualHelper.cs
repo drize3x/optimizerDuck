@@ -12,7 +12,7 @@ public static class VisualHelper
         {
             var child = VisualTreeHelper.GetChild(parent, i);
 
-            if (child is Frame frame && frame.Name == "PART_Frame")
+            if (child is Frame frame && frame.NavigationService != null)
                 return frame;
 
             var result = FindMainFrame(child);
