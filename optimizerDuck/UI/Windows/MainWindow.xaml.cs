@@ -26,7 +26,7 @@ public partial class MainWindow : IWindow
 
         snackbarService.SetSnackbarPresenter(SnackbarPresenter);
         contentDialogService.SetDialogHost(RootContentDialogPresenter);
-        navigationService.SetNavigationControl(RootNavigation);
+        navigationService.SetNavigationControl(RootNavigation); 
 
         RootNavigation.SetPageProviderService(pageProvider);
 
@@ -38,14 +38,18 @@ public partial class MainWindow : IWindow
 
     }
 
-    private void OnRootNavigationLoaded(object sender, RoutedEventArgs e)
+    private async void OnRootNavigationLoaded(object sender, RoutedEventArgs e)
     {
         RootNavigation.Loaded -= OnRootNavigationLoaded;
+
+        await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.Loaded);
 
         _frame = VisualHelper.FindMainFrame(RootNavigation);
 
         if (_frame != null)
+        {
             _frame.Navigated += Frame_Navigated;
+        }
 
         RootNavigation.Navigate(typeof(DashboardPage));
     }
@@ -55,21 +59,34 @@ public partial class MainWindow : IWindow
         if (e.Content is not Page page)
             return;
 
-        var transform = new ScaleTransform(0.96, 0.96);
-        page.RenderTransform = transform;
-        page.RenderTransformOrigin = new Point(0.5, 0.5);
-
+        // reset
         page.Opacity = 0;
 
-        var fade = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(200));
+        var translate = new TranslateTransform(0, 30);
+        var scale = new ScaleTransform(0.95, 0.95);
 
-        var scale = new DoubleAnimation(0.96, 1, TimeSpan.FromMilliseconds(200))
+        var group = new TransformGroup();
+        group.Children.Add(scale);
+        group.Children.Add(translate);
+
+        page.RenderTransform = group;
+        page.RenderTransformOrigin = new Point(0.5, 0.5);
+
+        var fade = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(320));
+
+        var move = new DoubleAnimation(30, 0, TimeSpan.FromMilliseconds(320))
+        {
+            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+        };
+
+        var zoom = new DoubleAnimation(0.95, 1, TimeSpan.FromMilliseconds(320))
         {
             EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
         };
 
         page.BeginAnimation(UIElement.OpacityProperty, fade);
-        transform.BeginAnimation(ScaleTransform.ScaleXProperty, scale);
-        transform.BeginAnimation(ScaleTransform.ScaleYProperty, scale);
+        translate.BeginAnimation(TranslateTransform.YProperty, move);
+        scale.BeginAnimation(ScaleTransform.ScaleXProperty, zoom);
+        scale.BeginAnimation(ScaleTransform.ScaleYProperty, zoom);
     }
 }
